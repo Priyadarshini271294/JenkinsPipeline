@@ -1,0 +1,171 @@
+"Name"    = 'NAB'
+"Author"  = 'UMA'
+"Version" = '1.0' 
+"About"   = 'This is a very simple grammar designed for use in examples with added functionality of Datastage functions'
+
+"Case Sensitive" = False 
+"Start Symbol"   = <Statements>
+
+{String Ch 1} = {Printable} - ['']
+{String Ch 2} = {Printable} - ["]
+{Identifier} = {AlphaNumeric} + ['_','']
+
+Id            = {Letter}{Identifier}*
+              | {Letter}{Identifier}*'.'{Letter}{Identifier}*
+
+! String allows either single or double quotes
+
+StringLiteral = ''   {String Ch 1}* ''
+              | '"'  {String Ch 2}* '"'
+
+
+NumberLiteral = {Digit}+('.'{Digit}+)?
+
+!<Statements> ::= <Statement> <Statements>
+ !              | <Statement>
+<Statements> ::= <Statement>
+<Statement>  ::= <Expression>
+                |CASE WHEN <Statements> THEN <Statements> ELSE <Statements> END
+                |SUM '( ' CASE WHEN <Statements> AND <Statements> IN '('<Statements>')' THEN <Statements> ELSE <Statements> END ')'
+                |CASE <Statements> WHEN <Statements> THEN <Statements> 
+                |SUM '(' CASE WHEN <Statements> IN'('<Statements>')'  AND <Statements> AND <Statements> THEN <Statements> ELSE <Statements> END ')'
+                |SUM '(' CASE WHEN <Statements>  THEN <Statements> ELSE  <Statements> END')'
+                |SQRT'('NVL'('<Statements>','<Statements>')''+'NVL'('<Statements>','<Statements>')'')'
+                |SUM '(' CASE WHEN <Statements> IN '('<Statements>')' AND <Statements> THEN <Statements> ELSE  <Statements> END')'
+                |CASE WHEN <Statements> AND <Statements> THEN <Statements> END
+                |SUM '(' WHEN <Statements> AND <Statements> THEN <Statements> ELSE <Statements> END')'
+                |SUM '(' CASE WHEN <Statements> IN '('<Statements>')' AND <Statements> THEN <Statements> END')'
+                |SUM '(' CASE WHEN <Statements> AND <Statements> IN '<'Statements'>'  THEN <Statements> ELSE  <Statements> END ')'
+                |SUM '(' CASE WHEN  <Statements> IN '('<Statements>')' THEN  <Statements> ELSE  <Statements> END')'
+                |CASE WHEN <Statements> AND <Statements> THEN <Statements> WHEN <Statements>  IN '('<Statements>')' AND <Statements> THEN <Statements> WHEN <Statements> AND<Statements> THEN <Statements> END
+                |TO_CHAR'('CASE WHEN <Statements> THEN <Statements> ELSE  <Statements> END')'
+                |SUM '('CASE WHEN <Statements> IN '(' <Statements> ')' AND <Statements> NOT IN '( '<Statements>' )' THEN <Statements> ELSE <Statements> END')'
+                |SUM '(' CASE WHEN <Statements> IN '('<Statements>')' THEN <Statements> END')'
+                |SUM '(' CASE WHEN <Statements> THEN <Statements> END ')'
+				|SUM '(' CASE WHEN  <Statements> IN '(' <Statements> ')' AND <Statements> AND <Statements> THEN <Statements> ELSE <Statements> END ')'
+				
+               
+<Expression>   ::= <Expression> '>'  <Add Exp> 
+                 | <Expression> '<'  <Add Exp> 
+                 | <Expression> '<=' <Add Exp> 
+                 | <Expression> '>=' <Add Exp>
+                 | <Expression> '=' <Add Exp>
+                 | <Expression> '<>' <Add Exp>
+                 | <Expression> 'OR' <Add Exp>
+                 | <Expression> 'AND' <Add Exp>
+                 | <Expression>'IN'  <Add Exp>
+                 | <Expression>'||'  <Add Exp>
+                 | <Add Exp> 
+
+<Add Exp>      ::= <Add Exp> '+' <Mult Exp>
+                 | <Add Exp> '-' <Mult Exp>
+                 | <Add Exp> '&' <Mult Exp>
+                 | <Add Exp> ':' <Mult Exp>
+                   | <Add Exp> '/' <Mult Exp>
+                  
+                 | <Mult Exp> 
+
+<Mult Exp>    ::= <Mult Exp> '*' <Negate Exp> 
+                | <Mult Exp> '/' <Negate Exp> 
+                | <Negate Exp> 
+                
+
+<Negate Exp>  ::= '-' <Value> 
+                | <Value> 
+
+<Value>       ::= ID           
+                | StringLiteral
+                | NumberLiteral
+                | '(' <Expression> ')'
+                | '(' <Expression> ','<Expression> ')'
+                | '(' <Expression> ','<Expression> ','<Expression> ')'
+                | '(' <Expression> ','<Expression> ','<Expression> ',' <Expression> ')'
+                | '(' <Expression> ','<Expression> ','<Expression>','<Expression>','<Expression> ')'
+                | '(' <Expression> ','<Expression> ','<Expression>','<Expression>','<Expression> ','<Expression>')'
+                | <function>
+                
+! Added DataStage Functions
+
+<function> ::= <Parallel transform function>
+<Parallel transform function> ::= <Date and time function>|<Logical function>|<Mathematical function>|<Null handling function>|<Raw function>|<Number function>
+                               |<String function>|<Vector function>|<Type conversion function>|<Utility function>
+<Date and time function> ::= CurrentDate'()'
+                          |CurrentTime'()'
+                          |CurrentTimeMS'()'
+                          |CurrentTimeStamp'()'
+                          |CurrentTimeStampMS'()'
+                          |DateFromDaysSince'(' <Statements> ',' <Statements> ')'
+                          |DateFromComponents
+                          |DateFromJulianDay'(' <Statements> ')'
+                          |DateOffsetByComponents
+                          |DaysSinceFromDate'(' <Statements> ',' <Statements> ')'
+                          |DaysInMonth'(' <Statements> ')'
+                          |DaysInYear|DateOffsetByDays|HoursFromTime
+                          |JulianDayFromDate
+                          |MicroSecondsFromTime|MidnightSecondsFromTime
+                          |MinutesFromTime|MonthDayFromDate|MonthFromDate|NextWeekdayFromDate|NthWeekdayFromDate|PreviousWeekdayFromDate
+                          |SecondsFromTime|SecondsSinceFromTimestamp|TimeDate|TimeFromComponents|TimeFromMidnightSeconds|TimeOffsetByComponents
+                          |TimeOffsetBySeconds|TimestampFromDateTime|TimestampFromSecondsSince|TimestampFromTimet|TimestampOffsetByComponents
+                          |TimestampOffsetBySeconds|TimetFromTimestamp|WeekdayFromDate|YeardayFromDate|YearFromDate|YearweekFromDate
+                          
+<Logical function> ::= BitAnd|BitCompress|BitExpand|BitOr|BitXOr|Not|SetBit
+<Mathematical function> ::= Abs '(' <Statements> ')'
+                         |Acos '(' <Statements> ')'
+                         |Asin|Atan|Ceil|Cos|Cosh|Div|Exp|Fabs|Floor|Ldexp|Llabs|Ln|Log10|Max|Min|Mod|Neg|Pwr|Rand|Random|Sin|Sinh|Sqrt|Tan|Tanh
+                         |sum'('<Statements>')'|SQRT'('<Statements>')'
+                         |MAX'('<Statements>')'
+                         
+                          
+                         
+<Null handling function> ::= IsNotNull'('')'|IsNull'(' <Statements> ')'|NullToEmpty|NullToZero|NullFieldIfNull'('<Statements>')'
+                          |NullToValue '(' <Statements> ',' <Statements> ')'
+                          |SetNull '('')'
+                          |NullFieldIfNull'('<Statements>')'
+<Number function> ::= AsFloat|AsInteger|MantissaFromDecimal|MantissaFromDFloat
+<Raw function> ::= RawLength
+<String function> ::= AlNum '(' <Statements> ')'
+                   |Alpha '(' <Statements> ')'
+                   |CompactWhiteSpace '(' <Statements> ')'
+                   |Compare '(' <Statements> ',' <Statements> ',' <Statements> ')'
+                   |CompareNoCase '(' <Statements> ',' <Statements> ')'
+                   |CompareNum '(' <Statements> ',' <Statements> ',' <Statements> ')'
+                   |CompareNumNoCase '(' <Statements> ',' <Statements> ',' <Statements> ')'
+                   |Convert '(' <Statements> ',' <Statements> ',' <Statements> ')'
+                   |Count '(' <Statements> ',' <Statements>')'
+                   |Dcount '(' <Statements> ',' <Statements>  ')'
+                   |DownCase '(' <Statements> ')'
+                   |DQuote '(' <Statements> ')'
+                   |Field '(' <Statements> ',' <Statements> ',' <Statements> ')'
+                   |Index '(' <Statements> ',' <Statements> ',' <Statements> ')'
+                   |Left '(' <Statements> ',' <Statements> ')'
+                   |Len '(' <Statements> ')'
+                   |Num '(' <Statements> ')'
+                   |PadString '(' <Statements> ',' <Statements> ',' <Statements> ')'
+                   |Right '(' <Statements> ',' <Statements> ')'                    
+                   |Soundex '(' <Statements> ')'                  
+                   |Space '(' <Statements> ')'
+                   |SQuote '(' <Statements> ')'
+                   |Str '(' <Statements> ',' <Statements> ')'
+                   |StripWhiteSpace '(' <Statements> ')'
+                   |Trim '(' <Statements> ')'
+                   |Trim '(' <Statements> ',' <Statements> ')'
+                   |TrimB '(' <Statements> ')'
+                   |SUBSTR'('<Statements>')'
+                   |TrimF '(' <Statements> ')'
+                   |NVL'(' <Statements> ')'
+                   |TrimLeadingTrailing '(' <Statements> ')'
+                   |UpCase '(' <Statements> ')'
+                   |string_lrtrim '(' <Statements> ')'
+                   |re_replace '(' <Statements> ',' <Statements> ',' <Statements> ')'
+                   |string_upcase '(' <Statements> ')'
+                   |NVL'(' <Statements> ')''-' NVL'(' <Statements> ')' 
+                   |POWER'(' <Statements> ')'
+                   |to_date'(' <Statements> ',' '<Statements>' ')'
+                   |Extract'(' <Statements> ')'
+				   | POWER '('<Statements>','<Statements>')'
+<Vector function> ::= ElementAt
+<Type conversion function> ::= Char|DateToString|DateToDecimal|DecimalToDate|DecimalToDecimal|DecimalToDFloat|DecimalToString|DecimalToTime
+                            |DecimalToTimestamp|DFloatToDecimal|DfloatToStringNoExp|IsValid|IsValidDate|IsValidDecimal|IsValidTime|IsValidTimestamp
+                            |RawNumAt|RawToString|Seq|SeqAt|StringToDate|StringToDecimal|StringToRaw|UstringToString
+<Utility function> ::= GetEnvironment|GetSavedInputRecord|NextSKChain|NextSurrogateKey|PrevSKChain|SaveInputRecord
+
