@@ -17,6 +17,7 @@ public class ErwinSqlParser {
     public static void main(String[] args) {
         // TODO code application logic here
         System.out.println("First Build");
+        System.out.println("Second Build");
     }
     
 }
