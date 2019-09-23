@@ -209,7 +209,7 @@ pipeline {
     always {
       zulipNotification (
         stream: 'JenkinsSample',
-        topic: "${env.JOB_NAME}"
+        topic: "Priya"
       )
     }
   }
