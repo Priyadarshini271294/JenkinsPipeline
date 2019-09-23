@@ -1,7 +1,7 @@
 pipeline {
   agent any
   environment {
-    PHANTOMJS_PLATFORM = 'linux'
+    PHANTOMJS_PLATFORM = 'windows'
   }
   options {
     timestamps()
